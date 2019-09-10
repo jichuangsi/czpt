@@ -104,42 +104,42 @@ body {
     width: 100%;
     height: 60%;
     padding: 0px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
-}
-.changebox .power .power_left {
-    width: 45%;
-    height: 100%;
-    padding-left: 10px;
-    border: 1px solid #f2f2f2;
     overflow-y: auto;
-}
-.changebox .power .power_left div {
-    margin-bottom: 20px;
-    cursor: pointer;
-}
-.changebox .power .power_right {
-    width: 45%;
-    height: 100%;
-    padding-left: 10px;
+    padding-left: 20px;
     border: 1px solid #f2f2f2;
-    overflow-y: auto;
 }
-.changebox .power .power_right div {
-    margin-bottom: 20px;
+.changebox .power .power_title {
+
+}
+.changebox .power span {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #999;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+}
+.changebox .power .power_title div {
+    display: inline-block;
+    font-size: 20px;
+    line-height: 32px;
+    vertical-align: middle;
     cursor: pointer;
+} 
+.changebox .power .power_child {
+    padding-left: 20px;
 }
-.changebox .power_text {
-    width: 100%;
-    padding: 0px 10px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-.changebox .power_text div {
-    width: 45%;
+.changebox .power .power_child div {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 32px;
+    vertical-align: middle;
+    cursor: pointer;
+} 
+.changebox .power .icon-tick {
+    background-color: #35aa47;
+    color: #fff;
 }
 .changebox .none{
     position: absolute;

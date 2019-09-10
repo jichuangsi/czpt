@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assest/style/reset.css">
     <link rel="stylesheet" href="./libs/bootstrap.css">
-    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/font_y1qjl4tmzac/iconfont.css">
     <link rel="stylesheet" href="./assest/style/index.css">
     <script src="./libs/jquery.min.js"></script>
     <script src="./libs/template-web.js"></script>
@@ -36,14 +36,8 @@
         <div class="changebox">
             <div class="title"></div>
             <div class="none iconfont icon-guanbi" onclick="changebox_none()"></div>
-            <div class="power_text">
-                <div class="text_left">未有权限:</div>
-                <div class="text_right">已有权限:</div>
-            </div>
             <div class="power">
-                <div class="power_left"></div>
-                <div class="iconfont icon-zhuanhuan"></div>
-                <div class="power_right"></div>
+               
             </div>
             <div class="power_btn" onclick="power_btn()">
                 确认
@@ -69,6 +63,29 @@
                 {{/each}}
             </div>
         </div>
+    {{/each}}
+</script>
+<script type="text/template" id="power">
+    {{each items as value index}}
+    <div class="power_title" onclick="power_title(this)">
+            <span class="iconfont icon-tick"></span>
+            <div>{{value.nodeName}}</div>
+        </div>
+        <div class="power_child_box">
+        {{each value.child as item}}
+        <div class="power_child" data-id="{{item.pageId}}" onclick="power_child(this)">
+            {{if item.status == '1'}}
+            <span class="iconfont icon-tick"></span>
+            {{else if item.status == '0'}}
+            <span class="iconfont"></span>
+            {{else}}
+            {{/if}}
+            <div>
+                {{item.pageName}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
     {{/each}}
 </script>
 <script>
@@ -139,6 +156,7 @@
     function child(val){
         if($(val).attr('data-url')!= ""){
             $('#box')[0].src = "."+$(val).attr('data-url')
+            
         }
         event.stopPropagation()
         $('.child').removeClass('child_check')
@@ -189,9 +207,27 @@
             url:'http://192.168.43.42:8080/backRoleConsole/getAllStaticPage',
             dataType:'json',
             success:function(res){
-                console.log(res)
+                // console.log(res)
                 if(res.code == '0010'){
-                var arr = res.data
+                    let arr = res.data
+                    let arr1 = []
+                    let arr2 = []
+                    for(let i = 0; i <arr.length;i++){
+                        // if(res.data[i].nodeName)
+                        if(arr1.indexOf(arr[i].nodeName)==-1){
+                            arr1.push(arr[i].nodeName);
+                            arr2.push({nodeName:arr[i].nodeName,child:[]});
+                        }
+                    }
+                    for(let i = 0; i <arr.length;i++){
+                        // if(res.data[i].nodeName)
+                        for(let j = 0;j<arr2.length;j++){
+                            if(arr[i].nodeName == arr2[j].nodeName){
+                                arr2[j].child.push(arr[i])
+                            }
+                        }
+                    }
+                    
                     $.ajax({
                         type:'GET',
                         url:'http://192.168.43.42:8080/backRoleConsole/getJurisdictionByRoleId',
@@ -200,27 +236,41 @@
                             roleId:id
                         },
                         success:function(res){
-                            // console.log(res)
+                            console.log(res)
                             if(res.code == '0010'){
-                                for(let i = 0 ; i < arr.length; i++){
-                                    for(let j = 0; j < res.data.length; j++){
-                                        if(arr[i].pageId == res.data[j].pageId){
-                                            arr.splice(i,1)
-                                        }
+                                for(let i = 0 ; i < arr2.length; i++){
+                                    for(let j = 0; j < arr2[i].child.length; j++){
+                                        arr2[i].child[j].status = 0
+                                            for(let q = 0; q <  res.data.length; q++){
+                                                if(arr2[i].child[j].pageId == res.data[q].pageId){
+                                                    arr2[i].child[j].status =1
+                                                }
+                                            }
                                     }
                                 }
-                                let left = ''
-                                let right = ''
-                                for(let i = 0 ; i < arr.length; i++){
-                                    left +="<div onclick='power_left("+arr[i].pageId+")'>"+arr[i].pageName+"</div>"
+                                
+                                var data ={
+                                    items:arr2
                                 }
-                                for(let i = 0 ; i < res.data.length; i++){
-                                    right +="<div onclick='power_right("+res.data[i].pageId+")'>"+res.data[i].pageName+"</div>"
-                                }
-                                power_left_arr = arr
-                                power_right_arr = res.data
-                                $('.power_left').append(left)
-                                $('.power_right').append(right) 
+                                var html = template('power',data)
+                                // console.log(html)
+                                $('.power').append(html)
+                                // let left = ''
+                                // let right = ''
+                                    for(let i = 0 ; i < $('.power_child_box').length; i++){
+                                        for(let j = 0; j<$('.power_child_box').eq(i).find('span').length;j++){
+                                            if($('.power_child_box').eq(i).find('span')[j].className.indexOf('icon-tick') == -1){
+                                                $('.power_child_box').eq(i).find('span').parent().parent().prev().find('span').removeClass('icon-tick')
+                                            }
+                                        }
+                                    }
+                                // for(let i = 0 ; i < res.data.length; i++){
+                                //     right +="<div onclick='power_right("+res.data[i].pageId+")'>"+res.data[i].pageName+"</div>"
+                                // }
+                                // power_left_arr = arr
+                                // power_right_arr = res.data
+                                // $('.power_left').append(left)
+                                // $('.power_right').append(right) 
                             }
                         }
                     })
@@ -228,61 +278,44 @@
             }
         })
     }
-    function power_left(id){
-        for(let i = 0 ; i < power_left_arr.length; i++){
-            if(power_left_arr[i].pageId == id){
-                console.log(power_left_arr[i])
-                power_right_arr.push(power_left_arr[i])
-                power_left_arr.splice(i,1)
-            }
+    function power_title(val) {
+        if($(val).find('span')[0].className.indexOf('icon-tick') != -1){
+            $(val).find('span').removeClass('icon-tick')
+            $(val).next().find('span').removeClass('icon-tick')
+        }else{
+            $(val).find('span').addClass('icon-tick')
+            $(val).next().find('span').addClass('icon-tick')
         }
-                                let left = ''
-                                let right = ''
-        for(let i = 0 ; i < power_left_arr.length; i++){
-            left +="<div onclick='power_left("+power_left_arr[i].pageId+")'>"+power_left_arr[i].pageName+"</div>"
-        }
-        for(let i = 0 ; i < power_right_arr.length; i++){
-            right +="<div onclick='power_right("+power_right_arr[i].pageId+")'>"+power_right_arr[i].pageName+"</div>"
-        }
-        $('.power_left').children().remove()
-        $('.power_right').children().remove()
-        $('.power_left').append(left)
-        $('.power_right').append(right) 
     }
-    function power_right(id){
-        for(let i = 0 ; i < power_right_arr.length; i++){
-            if(power_right_arr[i].pageId == id){
-                power_left_arr.push(power_right_arr[i])
-                power_right_arr.splice(i,1)
+    function power_child(val) {
+        if($(val).find('span')[0].className.indexOf('icon-tick') != -1){
+            $(val).find('span').removeClass('icon-tick')
+        }else{
+            $(val).find('span').addClass('icon-tick')
+        }
+        for(let i = 0; i<$(val).parent().find('span').length;i++){
+            if($(val).parent().find('span')[i].className.indexOf('icon-tick')==-1){
+                $(val).parent().prev().find('span').removeClass('icon-tick')
+                return
+            }else{
+                $(val).parent().prev().find('span').addClass('icon-tick')
             }
         }
-                                let left = ''
-                                let right = ''
-        for(let i = 0 ; i < power_left_arr.length; i++){
-            left +="<div onclick='power_left("+power_left_arr[i].pageId+")'>"+power_left_arr[i].pageName+"</div>"
-        }
-        for(let i = 0 ; i < power_right_arr.length; i++){
-            right +="<div onclick='power_right("+power_right_arr[i].pageId+")'>"+power_right_arr[i].pageName+"</div>"
-        }
-        $('.power_left').children().remove()
-        $('.power_right').children().remove()
-        $('.power_left').append(left)
-        $('.power_right').append(right) 
     }
     function changebox_none() {
         $('.change_box').css('display','none')
-        $('.power_left').children().remove()
-        $('.power_right').children().remove()
+        $('.power').children().remove()
     }
     function power_btn(){
-        console.log($('.power_btn').text())
         if($('.power_btn').text().indexOf('确认')!=-1){
-        console.log(789)
                 $(".power_btn").text('提交中...')
                 $(".power_btn").css('backgroundColor','#999')
             var relationList = []
-            for(let i = 0 ; i < power_right_arr.length; i++){
-                relationList.push({pageId:power_right_arr[i].pageId,roleId:roleId})
+            for(let i = 0 ; i < $('.power_child').length; i++){
+                console.log($('.power_child')[i].className)
+                if($('.power_child').eq(i).find('span')[0].className.indexOf('icon-tick')!=-1){
+                    relationList.push({pageId:$('.power_child').eq(i).attr('data-id'),roleId:roleId})
+                }
             }
             $.ajax({
                 type:'POST',
@@ -300,8 +333,7 @@
                         $('.message_box').css('display','block')
                         setTimeout(function(){
                             $('.change_box').css('display','none')
-                            $('.power_left').children().remove()
-                            $('.power_right').children().remove()
+                            $('.power').children().remove()
                         },500)
                         setTimeout(function(){
                             $('.message_box').css('display','none')

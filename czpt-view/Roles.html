@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assest/style/reset.css">
     <link rel="stylesheet" href="./libs/bootstrap.css">
-    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/font_y1qjl4tmzac/iconfont.css">
     <link rel="stylesheet" href="./assest/style/roles.css">
     <script src="./libs/jquery.min.js"></script>
     <script src="./libs/template-web.js"></script>
@@ -35,12 +35,36 @@
         </table>
 </script>
 <script>
+    var token = sessionStorage.getItem('token')
+    if(!token){
+        window.location.href='./login.html'
+    }
+    $.ajax({
+                type:'GET',
+                url:'http://192.168.43.42:8080/backRoleConsole/checkJurisdiction',
+                headers: {
+                    'accessToken': token
+                },
+                data:{
+                    "url":window.location.pathname
+                },
+                dataType:'json',
+                success:function(res){
+                    console.log(res)
+                    if(res.code == '0010'){
+                        if(!res.data){
+                            window.location.href = './login.html'
+                        }
+                    }
+                }
+            })
      $.ajax({
             type:"GET",
             url:'http://192.168.43.42:8080/backRoleConsole/getAllRole',
             data:'',
             dataType:'json',
             success:function(res){
+                console.log(res)
                 if(res.code == '0010'){
                     var data= {
                         items:res.data
