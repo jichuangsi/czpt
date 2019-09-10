@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assest/style/reset.css">
+    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/style/login.css">
+    <script src="./libs/jquery.min.js"></script>
+</head>
+<body>
+    <div class="login_box">
+        <div class="title">用户登录</div>
+        <div class="ipt">
+            <span class="iconfont icon-yonghu"></span>
+            <input type="text" class="account" class="account" placeholder="请输入用户名">
+        </div>
+        <div class="error">用户名不能为空</div>
+        <div class="ipt">
+            <span class="iconfont icon-mima"></span>
+            <input type="password" class="pwd" placeholder="请输入密码">
+        </div>
+        <div class="error">密码错误</div>
+        <div class="help clearfix">
+            <div class="fl register"><a href="./register.html">注册账户</a></div>
+            <div class="fr"><a href="">忘记密码？</a></div>
+        </div>
+        <div class="btn">登录</div>
+    </div>
+    <div class="box">
+        登录成功
+    </div>
+</body>
+<script>
+    $('.btn').click(function(){
+        var account = $('.account').val()
+        var pwd = $('.pwd').val()
+        if(account!=""&&pwd!=""){
+            if($(".btn").text() == '登录'){
+                $(".btn").text('登录中...')
+                $(".btn").css('backgroundColor','#999')
+            var cc = {
+                "account":account,
+                "pwd":pwd
+            }
+            $.ajax({
+                type:"POST",
+                url:'http://192.168.43.42:8080/backuser/loginBackUser',
+                data:JSON.stringify(cc),
+                dataType:'json',
+                contentType: 'application/json',
+                success:function(res){
+                    console.log(res)
+                    $(".btn").text('登录')
+                    $(".btn").css('backgroundColor','#35aa47')
+                    if(res.code == '0010'){
+                        $('.box').text('登录成功')
+                        $('.box').css('display','block');
+                        sessionStorage.setItem('token',res.data)
+                        setTimeout(function(){
+                            window.location.href = './index.html'
+                        },500)
+                    }else{
+                        $('.box').text(res.msg)
+                        $('.box').css('display','block');
+                        setTimeout(function(){
+                            $('.box').css('display','none');
+                        },1000)
+                    }
+                },
+                error:function(err){
+                    console.log(err)
+                    $(".btn").text('登录')
+                    $(".btn").css('backgroundColor','#35aa47')
+                    alert('登录失败')
+                }
+            })
+            }
+        }else{
+            alert('账号密码不能为空')
+        }
+    })
+</script>
+</html>

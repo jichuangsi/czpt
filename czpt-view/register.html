@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assest/style/reset.css">
+    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/style/register.css">
+    <script src="./libs/jquery.min.js"></script>
+</head>
+<body>
+    <div class="login_box">
+        <div class="title">用户注册</div>
+        <div class="ipt">
+            <span class="iconfont icon-yonghu"></span>
+            <input type="text" class="account" onKeyUp="value=value.replace(/[\W]/g,'')" placeholder="请输入账号">
+        </div>
+        <div class="ipt">
+            <span class="iconfont icon-yonghu"></span>
+            <input type="text" class="userName" placeholder="请输入用户名">
+        </div>
+        <div class="ipt">
+            <span class="iconfont icon-yonghu"></span>
+            <select name="" id="role">
+                
+            </select>
+        </div>
+        <div class="ipt">
+            <span class="iconfont icon-mima"></span>
+            <input type="password" class="pwd" placeholder="请输入6-12位密码">
+        </div>
+        <div class="btn">注册</div>
+    </div>
+    <div class="box">
+        注册成功
+    </div>
+</body>
+<script>
+     $.ajax({
+            type:"GET",
+            url:'http://192.168.43.42:8080/backRoleConsole/getAllRole',
+            data:'',
+            dataType:'json',
+            success:function(res){
+                console.log(res)
+                let html = ''
+                if(res.code == '0010'){
+                    for(let i = 0; i<res.data.length;i++){
+                        html+='<option value="'+res.data[i].id+'">'+res.data[i].roleName+'</option>'
+                    }
+                    $('select').append(html)
+                }
+            }
+        })
+    $('.btn').click(function(){
+        var account = $('.account').val()
+        var userName = $('.userName').val()
+        var pwd = $('.pwd').val()
+        var roleId = $('select option:selected').val()
+        var roleName = $('select option:selected').text()
+        if(account!=""&&userName!=""&&pwd!=""&&roleId!=""&&roleName!=""){
+            var reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,12}$/
+            console.log(Boolean(reg.test(pwd)))
+            if(reg.test(pwd)){
+                if($(".btn").text() == '注册'){
+                    $(".btn").text('注册中...')
+                    $(".btn").css('backgroundColor','#999')
+                    var cc = {
+                    "account":account,
+                    "userName":userName,
+                    "pwd":pwd,
+                    "roleId":roleId,
+                    "roleName":roleName
+                    }
+                    $.ajax({
+                        type:"POST",
+                        url:'http://192.168.43.42:8080/backuser/registBackUser',
+                        data:JSON.stringify(cc),
+                        dataType:'json',
+                        contentType: 'application/json',
+                        success:function(res){
+                            $(".btn").text('注册')
+                            $(".btn").css('backgroundColor','#35aa47')
+                            console.log(res)
+                            if(res.code == '0010'){
+                                $('.box').text('注册成功')
+                                $('.box').css('display','block');
+                                setTimeout(function(){
+                                    window.location.href = './login.html'
+                                },500)
+                            }else{
+                                $('.box').text(res.msg)
+                                $('.box').css('display','block');
+                                setTimeout(function(){
+                                    $('.box').css('display','none');
+                                },1000)
+                            }
+                        },
+                        error:function(err){
+                            console.log(err)
+                            $(".btn").text('注册')
+                            $(".btn").css('backgroundColor','#35aa47')
+                            alert('注册失败')
+                        }
+                    })
+                }
+            }else{
+                alert('请输入6-12位字母数字混合密码')
+            }
+        }
+            
+    })
+</script>
+</html>
