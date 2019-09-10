@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assest/style/reset.css">
+    <link rel="stylesheet" href="./libs/bootstrap.css">
+    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/style/index.css">
+    <script src="./libs/jquery.min.js"></script>
+    <script src="./libs/template-web.js"></script>
+    <script src="./libs/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="row top">
+        <div class="col-xs-2 col-md-2"></div>
+        <div class="col-xs-10 col-md-10" style="padding-left:0px">
+            <div class="text">个人管理</div>
+            <div class="fr list_nav iconfont icon-list"></div>
+            <div class="fr loginout">注销</div>
+        </div>
+    </div>
+    <div class="row bottom">
+        <div class="left col-xs-12 col-md-2">
+        </div>
+        <div class="right col-xs-12 col-md-10">
+            <ol class="breadcrumb">
+                <li><a href="#">首页</a></li>
+            </ol>
+            <iframe id="box" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+    <div class="change_box">
+        <div class="changebox">
+            <div class="title"></div>
+            <div class="none iconfont icon-guanbi" onclick="changebox_none()"></div>
+            <div class="power_text">
+                <div class="text_left">未有权限:</div>
+                <div class="text_right">已有权限:</div>
+            </div>
+            <div class="power">
+                <div class="power_left"></div>
+                <div class="iconfont icon-zhuanhuan"></div>
+                <div class="power_right"></div>
+            </div>
+            <div class="power_btn" onclick="power_btn()">
+                确认
+            </div>
+        </div>
+    </div>
+    <div class="message_box">
+        成功
+    </div>
+</body>
+<script type="text/template" id="classify">
+    {{each items as value index}}
+     <div class="list" onclick="list(this)">
+            <div class="Adult">
+                <span>{{value.nodeName}}</span>
+                <span class="iconfont icon-Group- fr"></span>
+            </div>
+            <div class="child_box">
+                {{each value.child as item}}
+                    <div class="child" data-url="{{item.pageUrl}}" onclick="child(this)">
+                        {{item.pageName}}
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    {{/each}}
+</script>
+<script>
+    var power_left_arr = [];
+    var power_right_arr = [];
+    var roleId;
+    var token = sessionStorage.getItem('token')
+    if(!token){
+        window.location.href='./login.html'
+    }
+    $.ajax({
+        type:'GET',
+        url:'http://192.168.43.42:8080/backRoleConsole/getStaticPageByRoleId',
+        headers: {
+			'accessToken': token
+        },
+        dataType:'json',
+        success:function(res){
+            console.log(res)
+            let arr = []
+            if(res.code == '0010'){
+                let arr = res.data
+                let arr1 = []
+                let arr2 = []
+                for(let i = 0; i <arr.length;i++){
+                    // if(res.data[i].nodeName)
+                    if(arr1.indexOf(arr[i].nodeName)==-1){
+                        arr1.push(arr[i].nodeName);
+                        arr2.push({nodeName:arr[i].nodeName,child:[]});
+                    }
+                }
+                for(let i = 0; i <arr.length;i++){
+                    // if(res.data[i].nodeName)
+                    for(let j = 0;j<arr2.length;j++){
+                        if(arr[i].nodeName == arr2[j].nodeName){
+                            arr2[j].child.push(arr[i])
+                        }
+                    }
+                }
+                var data ={
+                    items:arr2
+                }
+                var html = template('classify',data)
+                // console.log(html)
+                $('.bottom > .left').append(html)
+            }
+        }
+    })
+    function list(val){
+        if($(val).find('.child_check')[0]){
+            // $('.child').removeClass('child_check')
+            $(val).find('.child_box').css('height','0px')
+            $('.Adult').removeClass('Adult_check')
+            $(val).find('.iconfont').removeClass('icon-xia')
+            $(val).find('.iconfont').addClass('icon-Group-')
+        }else{
+            $('.child').removeClass('child_check')
+            $('.child_box').css('height','0px')
+            $('.row').find('.iconfont').removeClass('icon-xia')
+            $('.row').find('.iconfont').addClass('icon-Group-')
+            $(val).find('.child_box').css('height','auto')
+            $(val).find('.iconfont').removeClass('icon-Group-')
+            $(val).find('.iconfont').addClass('icon-xia')
+            $('.Adult').removeClass('Adult_check')
+            $(val).find('.Adult').addClass('Adult_check')
+        }
+    }
+    function child(val){
+        if($(val).attr('data-url')!= ""){
+            $('#box')[0].src = "."+$(val).attr('data-url')
+        }
+        event.stopPropagation()
+        $('.child').removeClass('child_check')
+        $(val).addClass('child_check')
+        $('.breadcrumb').children().remove()
+        let one = '<li><a href="#">首页</a></li>'
+        // let two = '<li>'+$(val).parent().find('span').text()+'</li>'
+        let three = '<li>'+$(val).text()+'</li>'
+        $('.breadcrumb').append(one)
+        // $('.breadcrumb').append(two)
+        $('.breadcrumb').append(three)
+        if(window.innerWidth<992){
+            $('.bottom>.left').css('height','0px')
+        }
+    }
+    $('.bottom>.left').css('height',window.innerHeight-50+'px')
+    $('#box').css('height',window.innerHeight-120+'px')
+    $('.list_nav').css('display','none')
+    if(window.innerWidth<992){
+            $('.bottom>.left').css('height','0px')
+            $('.list_nav').css('display','block')
+        }
+    $('.loginout').click(function(){
+        sessionStorage.removeItem('token')
+        window.location.href = './login.html'
+    })
+    $('.list_nav').click(function(){
+            $('.bottom>.left').css('height','auto')
+    })
+    onresize = function(){
+        if(window.innerWidth<992){
+            $('.bottom>.left').css('height','0px')
+            $('.list_nav').css('display','block')
+        }else{
+            $('.bottom>.left').css('height',window.innerHeight-30+'px')
+            $('.list_nav').css('display','none')
+        }
+    }
+    function change_box(id,title) {
+        console.log(title)
+        roleId = id
+        $('.change_box').css('display','block')
+        $('.change_box').css('backgroundColor','rgba(0, 0, 0, 0.6)')
+        console.log($('.change_box >.title')[0])
+        $('.change_box').find('.title').text(title)
+        $.ajax({
+            type:'GET',
+            url:'http://192.168.43.42:8080/backRoleConsole/getAllStaticPage',
+            dataType:'json',
+            success:function(res){
+                console.log(res)
+                if(res.code == '0010'){
+                var arr = res.data
+                    $.ajax({
+                        type:'GET',
+                        url:'http://192.168.43.42:8080/backRoleConsole/getJurisdictionByRoleId',
+                        dataType:'json',
+                        data:{
+                            roleId:id
+                        },
+                        success:function(res){
+                            // console.log(res)
+                            if(res.code == '0010'){
+                                for(let i = 0 ; i < arr.length; i++){
+                                    for(let j = 0; j < res.data.length; j++){
+                                        if(arr[i].pageId == res.data[j].pageId){
+                                            arr.splice(i,1)
+                                        }
+                                    }
+                                }
+                                let left = ''
+                                let right = ''
+                                for(let i = 0 ; i < arr.length; i++){
+                                    left +="<div onclick='power_left("+arr[i].pageId+")'>"+arr[i].pageName+"</div>"
+                                }
+                                for(let i = 0 ; i < res.data.length; i++){
+                                    right +="<div onclick='power_right("+res.data[i].pageId+")'>"+res.data[i].pageName+"</div>"
+                                }
+                                power_left_arr = arr
+                                power_right_arr = res.data
+                                $('.power_left').append(left)
+                                $('.power_right').append(right) 
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    }
+    function power_left(id){
+        for(let i = 0 ; i < power_left_arr.length; i++){
+            if(power_left_arr[i].pageId == id){
+                console.log(power_left_arr[i])
+                power_right_arr.push(power_left_arr[i])
+                power_left_arr.splice(i,1)
+            }
+        }
+                                let left = ''
+                                let right = ''
+        for(let i = 0 ; i < power_left_arr.length; i++){
+            left +="<div onclick='power_left("+power_left_arr[i].pageId+")'>"+power_left_arr[i].pageName+"</div>"
+        }
+        for(let i = 0 ; i < power_right_arr.length; i++){
+            right +="<div onclick='power_right("+power_right_arr[i].pageId+")'>"+power_right_arr[i].pageName+"</div>"
+        }
+        $('.power_left').children().remove()
+        $('.power_right').children().remove()
+        $('.power_left').append(left)
+        $('.power_right').append(right) 
+    }
+    function power_right(id){
+        for(let i = 0 ; i < power_right_arr.length; i++){
+            if(power_right_arr[i].pageId == id){
+                power_left_arr.push(power_right_arr[i])
+                power_right_arr.splice(i,1)
+            }
+        }
+                                let left = ''
+                                let right = ''
+        for(let i = 0 ; i < power_left_arr.length; i++){
+            left +="<div onclick='power_left("+power_left_arr[i].pageId+")'>"+power_left_arr[i].pageName+"</div>"
+        }
+        for(let i = 0 ; i < power_right_arr.length; i++){
+            right +="<div onclick='power_right("+power_right_arr[i].pageId+")'>"+power_right_arr[i].pageName+"</div>"
+        }
+        $('.power_left').children().remove()
+        $('.power_right').children().remove()
+        $('.power_left').append(left)
+        $('.power_right').append(right) 
+    }
+    function changebox_none() {
+        $('.change_box').css('display','none')
+        $('.power_left').children().remove()
+        $('.power_right').children().remove()
+    }
+    function power_btn(){
+        console.log($('.power_btn').text())
+        if($('.power_btn').text().indexOf('确认')!=-1){
+        console.log(789)
+                $(".power_btn").text('提交中...')
+                $(".power_btn").css('backgroundColor','#999')
+            var relationList = []
+            for(let i = 0 ; i < power_right_arr.length; i++){
+                relationList.push({pageId:power_right_arr[i].pageId,roleId:roleId})
+            }
+            $.ajax({
+                type:'POST',
+                url:'http://192.168.43.42:8080/backRoleConsole/batchUpdateRoleUrl',
+                headers: {
+                    'accessToken': token
+                },
+                dataType:'json',
+                data:JSON.stringify({relationList}),
+                contentType: 'application/json',//
+                success:function(res){
+                    $(".power_btn").text('确认')
+                    $(".power_btn").css('backgroundColor','#35aa47')
+                    if(res.code == '0010'){
+                        $('.message_box').css('display','block')
+                        setTimeout(function(){
+                            $('.change_box').css('display','none')
+                            $('.power_left').children().remove()
+                            $('.power_right').children().remove()
+                        },500)
+                        setTimeout(function(){
+                            $('.message_box').css('display','none')
+                        },1500)
+                    }
+                },
+                error:function(err){
+                    $(".power_btn").text('确认')
+                    $(".power_btn").css('backgroundColor','#35aa47')
+                    alert('提交失败')
+                }
+            })
+        }
+    }
+
+</script>
+</html>

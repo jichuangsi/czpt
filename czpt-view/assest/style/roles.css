@@ -1,0 +1,27 @@
+
+th {
+    white-space: nowrap;
+}
+td {
+    white-space: nowrap;
+}
+.one {
+    width: auto;
+    text-align: center;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.one span {
+    padding: 5px 10px;
+    color: #fff;
+    background-color: #35aa47;
+    border-radius: 5px;
+}
+.change_box {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(153, 29, 29);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}

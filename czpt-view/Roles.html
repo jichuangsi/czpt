@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assest/style/reset.css">
+    <link rel="stylesheet" href="./libs/bootstrap.css">
+    <link rel="stylesheet" href="./assest/font_tlb5ih1li4/iconfont.css">
+    <link rel="stylesheet" href="./assest/style/roles.css">
+    <script src="./libs/jquery.min.js"></script>
+    <script src="./libs/template-web.js"></script>
+    <script src="./libs/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="col-md-12">
+        <div class="table_box"></div>
+    </div>
+</body>
+<script type="text/template" id="table">
+        <table class="table table-striped table-bordered table-hover table-full-width dataTable">
+            <tr>
+                <th>角色id</th>
+                <th>角色名</th>
+                <th class="one">操作</th>
+            </tr>
+            {{each items as value index}}
+                <tr>
+                    <td class="id">{{value.id}}</td>
+                    <td class="roleName">{{value.roleName}}</td>
+                    <td class="one" onclick="sq({{value.id}},'{{value.roleName}}')"><span>授权</span></td>
+                </tr> 
+            {{/each}}
+        </table>
+</script>
+<script>
+     $.ajax({
+            type:"GET",
+            url:'http://192.168.43.42:8080/backRoleConsole/getAllRole',
+            data:'',
+            dataType:'json',
+            success:function(res){
+                if(res.code == '0010'){
+                    var data= {
+                        items:res.data
+                    }
+                    var html = template('table',data)
+                    $('.table_box').append(html)
+                }
+            }
+        })
+        function sq(val,name){
+            parent.change_box(val,name)
+        }
+</script>
+</html>
