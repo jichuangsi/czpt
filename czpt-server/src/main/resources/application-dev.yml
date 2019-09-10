@@ -5,6 +5,8 @@ custom:
     path: E:/logback/${spring.application.name}/${spring.profiles.active}
   token: 
     userClaim: userInfo
+    survivalTime: 7200000
+    secret: EC86@34$123c
     
 spring:
   application:
@@ -18,6 +20,6 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
-    
+
 server:
   port: 8080

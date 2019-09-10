@@ -18,5 +18,6 @@ public class ResultCode {
 	public static final String SYS_BUSY_MSG = "系统繁忙";
 
 	public static final String SELECT_NULL_MSG = "查无此信息";
-
+	public final static String ACCOUNT_ISEXIST_MSG = "账号已存在";
+	public final static String ACCOUNT_NOTEXIST_MSG = "账号不存在，或者账户密码错误";
 }
