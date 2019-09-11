@@ -33,8 +33,9 @@ public class BackRoleUrlService {
         return parentNodeRepository.findAll();
     }
     //获取全部页面
-    public List<StaticPageModel> getAllStaticPage(){
-        return MappingEntity2ModelCoverter.CONVERTERFROMStaticPage(staticPageRepository.findAll());
+    public List<RoleUrlModel> getAllStaticPage(){
+        /*return MappingEntity2ModelCoverter.CONVERTERFROMStaticPage(staticPageRepository.findAll());*/
+        return backUserMapper.getAllPage();
     }
 
     //批量添加角色可以访问的页面
